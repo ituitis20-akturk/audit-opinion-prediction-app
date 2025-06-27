@@ -87,19 +87,19 @@ def compute_ratios(df: pd.DataFrame) -> pd.DataFrame:
     df['Stok Devir Hızı']            = -safe_div(df['Satışların Maliyeti (-)'], df['Stoklar'])
 
     # --- 6) Capital structure ratios --------------------------------------------------
-    df['Borç Kaynak Oranı']                 = safe_div(total_liab, df['Toplam Özkaynaklar'])*100
+    df['Borç Kaynak Oranı']                 = safe_div(total_liab, df['Özkaynaklar'])*100
     df['Finansal Kaldıraç']                 = safe_div(total_liab, total_assets)*100
-    df['Özsermaye / Aktif']                = safe_div(df['Toplam Özkaynaklar'], total_assets)
-    df['Özsermaye / Maddi Duran Varlıklar'] = safe_div(df['Toplam Özkaynaklar'], df['Maddi Duran Varlıklar'])
+    df['Özsermaye / Aktif']                = safe_div(df['Özkaynaklar'], total_assets)
+    df['Özsermaye / Maddi Duran Varlıklar'] = safe_div(df['Özkaynaklar'], df['Maddi Duran Varlıklar'])
     df['Duran Varlıklar / Maddi Özkaynak']  = safe_div(df['Duran Varlıklar'],
-                                                       df['Toplam Özkaynaklar'] - df['Maddi Olmayan Duran Varlıklar'])
+                                                       df['Özkaynaklar'] - df['Maddi Olmayan Duran Varlıklar'])
     df['Duran Varlıklar / Aktif ']          = safe_div(df['Duran Varlıklar']*100, total_assets)
     df['Dönen Varlıklar / Aktif (%)']       = safe_div(df['Dönen Varlıklar']*100, total_assets)
 
     # --- 7) Short‑term debt focus -----------------------------------------------------
     df['Kısa Vade Borç / Aktif']          = safe_div(df['Kısa Vadeli Yükümlülükler'], total_assets)
     df['Kısa Vade Borç / Dönen Varlık']   = safe_div(df['Kısa Vadeli Yükümlülükler'], df['Dönen Varlıklar'])
-    df['Kısa Vade Borç / Özsermaye']      = safe_div(df['Kısa Vadeli Yükümlülükler'], df['Toplam Özkaynaklar'])
+    df['Kısa Vade Borç / Özsermaye']      = safe_div(df['Kısa Vadeli Yükümlülükler'], df['Özkaynaklar'])
     df['Kısa Vade Borç / Toplam Borç']    = safe_div(df['Kısa Vadeli Yükümlülükler'], total_liab)
     df['Net Satışlar / Kısa Vade Borç']   = safe_div(df['Satış Gelirleri'], df['Kısa Vadeli Yükümlülükler'])
     df['Esas Faaliyet Karı / Kısa Vadeli Borç'] = safe_div(df['Net Faaliyet Kar/Zararı'], df['Kısa Vadeli Yükümlülükler'])
@@ -114,7 +114,7 @@ def compute_ratios(df: pd.DataFrame) -> pd.DataFrame:
     X1 = safe_div(df['Dönen Varlıklar'] - df['Kısa Vadeli Yükümlülükler'], total_assets)
     X2 = safe_div(df['Geçmiş Yıllar Kar/Zararları'] + df['Dönem Net Kar/Zararı'], total_assets)
     X3 = safe_div(df['SÜRDÜRÜLEN FAALİYETLER VERGİ ÖNCESİ KARI (ZARARI)'], total_assets)
-    X4 = safe_div(df['Toplam Özkaynaklar'], total_liab)
+    X4 = safe_div(df['Özkaynaklar'], total_liab)
     X5 = safe_div(df['Satış Gelirleri'], total_assets)
     df['Altman Z-Skoru'] = 1.2*X1 + 1.4*X2 + 3.3*X3 + 0.6*X4 + X5
 
@@ -153,7 +153,7 @@ if not file:
 # --------------------------------------------------------------------------- #
 # 2️⃣  VERTICAL → HORIZONTAL dönüştürme  (senin eski kodun bire bir)
 # --------------------------------------------------------------------------- #
-raw_vert = pd.read_excel(BytesIO(file.read()), header=None, sheet_name=0)
+raw_vert = pd.read_excel(BytesIO(file.read()), header=None, sheet_name="Sheet1")
 raw_df = (
     raw_vert
     .set_index(0)          # Sol 1. sütun başlık oluyor
