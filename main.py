@@ -153,7 +153,7 @@ if not file:
 # --------------------------------------------------------------------------- #
 # 2️⃣  VERTICAL → HORIZONTAL dönüştürme  (senin eski kodun bire bir)
 # --------------------------------------------------------------------------- #
-raw_vert = pd.read_excel(BytesIO(file.read()), header=None, sheet_name="Sheet1")
+raw_vert = pd.read_excel(BytesIO(file.read()), header=None, sheet_name=0)
 raw_df = (
     raw_vert
     .set_index(0)          # Sol 1. sütun başlık oluyor
