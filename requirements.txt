@@ -2,7 +2,7 @@ streamlit==1.46.1
 pandas==2.2.2
 numpy==1.26.4
 scikit-learn==1.4.1.post1
-xgboost==2.0.3
+xgboost==1.7.6
 joblib==1.4.2
 openpyxl==3.1.2
 xlsxwriter==3.2.0
