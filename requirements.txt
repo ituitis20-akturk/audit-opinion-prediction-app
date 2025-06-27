@@ -1,8 +1,15 @@
-streamlit==1.35.0
+# ─── UI ─────────────────────────────────────────────
+streamlit==1.46.1      
+
+# ─── Veri & Matematik ──────────────────────────────
 pandas==2.2.2
-numpy==1.26.4
-scikit-learn==1.4.2
+numpy==1.26.4            
+
+# ─── ML Yığını ─────────────────────────────────────
+scikit-learn==1.4.2     
 xgboost==2.0.3
 joblib==1.4.2
-openpyxl==3.1.2
-xlsxwriter==3.2.0
+
+# ─── Excel Girdi / Çıktı ───────────────────────────
+openpyxl==3.1.2         
+xlsxwriter==3.2.0       
