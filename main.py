@@ -1,13 +1,5 @@
 
-"""Streamlit app: upload an Excel file, compute **32 specific financial ratios**, then run an
-XGB model that classifies “Görüş Tipi”.
-──────────────────────────────────────────────────────────────────────────────
-• User uploads **financial_data.xlsx** (one sheet, one row per firm/period).
-• Column names follow Turkish IFRS naming (e.g. "Dönen Varlıklar", "Kısa Vadeli Yükümlülükler" …).
-• Trained bundle **slim_xgb.joblib** (pipeline + LabelEncoder) must live in the
-  same folder.
 
-"""
 
 import streamlit as st
 import pandas as pd
