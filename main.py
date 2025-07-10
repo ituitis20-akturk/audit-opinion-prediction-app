@@ -17,7 +17,7 @@ MODEL_PATH = "slim_xgb.joblib"  # → (pipeline, encoder)
 
 
 
-# 32 finansal oran / metrik – model tam olarak bunları bekliyor
+
 SELECTED_FEATS = [
     'Altman Z-Skoru', 'Finansal Kaldıraç', 'Nakit Oranı', 'Aktif Devir Hızı',
     'L Model Skoru', 'Zmijewski Skoru', 'Asit Test Oranı',
@@ -54,31 +54,31 @@ def compute_ratios(df: pd.DataFrame) -> pd.DataFrame:
     # --- 1) Standardise header names -------------------------------------------------
 
 
-    # --- 2) Common aggregates (avoid recalculating) ----------------------------------
+    # 2) Common aggregates 
     total_assets = df['Dönen Varlıklar'] + df['Duran Varlıklar']
     total_liab   = df['Kısa Vadeli Yükümlülükler'] + df['Uzun Vadeli Yükümlülükler']
 
-    # --- 3) Liquidity ratios ----------------------------------------------------------
+    # 3) Liquidity ratios 
     df['Cari Oran']              = safe_div(df['Dönen Varlıklar'], df['Kısa Vadeli Yükümlülükler'])
     df['Asit Test Oranı']        = safe_div(df['Dönen Varlıklar'] - df['Stoklar'] - df['Diğer Dönen Varlıklar'],
                                             df['Kısa Vadeli Yükümlülükler'])
     df['Nakit Oranı']            = safe_div(df['Nakit ve Nakit Benzerleri'], df['Kısa Vadeli Yükümlülükler'])
 
-    # --- 4) Profitability & margins ---------------------------------------------------
+    #  4) Profitability & margins 
     df['Faaliyet Kar Marjı']     = safe_div(df['FAALİYET KARI (ZARARI)']*100, df['Satış Gelirleri'])
     df['Esas Faaliyet Kar Marjı']= safe_div(df['Net Faaliyet Kar/Zararı']*100, df['Satış Gelirleri'])
     df['Brüt Kar Marjı (%)']     = safe_div(df['Ticari Faaliyetlerden Brüt Kar (Zarar)']*100, df['Satış Gelirleri'])
     df['Net Kar Marjı']          = safe_div(df['Dönem Net Kar/Zararı']*100, df['Satış Gelirleri'])
     df['FAVÖK / Kısa Vade Borç'] = safe_div(df['FAALİYET KARI (ZARARI)'], df['Kısa Vadeli Yükümlülükler'])
 
-    # --- 5) Turnover ratios -----------------------------------------------------------
+    #  5) Turnover ratios 
     df['Aktif Devir Hızı']           = safe_div(df['Satış Gelirleri'], total_assets)
     df['Alacak Devir Hızı']          = safe_div(df['Satış Gelirleri'], df['Ticari Alacaklar'])
     df['Dönen Varlıklar Devir Hızı'] = safe_div(df['Dönen Varlıklar'], df['Satış Gelirleri'])
     df['Ticari Borçlar Devir Hızı']  = -safe_div(df['Satışların Maliyeti (-)'], df['Ticari Borçlar'])
     df['Stok Devir Hızı']            = -safe_div(df['Satışların Maliyeti (-)'], df['Stoklar'])
 
-    # --- 6) Capital structure ratios --------------------------------------------------
+    # 6) Capital structure ratios 
     df['Borç Kaynak Oranı']                 = safe_div(total_liab, df['Özkaynaklar'])*100
     df['Finansal Kaldıraç']                 = safe_div(total_liab, total_assets)*100
     df['Özsermaye / Aktif']                = safe_div(df['Özkaynaklar'], total_assets)
@@ -88,7 +88,7 @@ def compute_ratios(df: pd.DataFrame) -> pd.DataFrame:
     df['Duran Varlıklar / Aktif ']          = safe_div(df['Duran Varlıklar']*100, total_assets)
     df['Dönen Varlıklar / Aktif (%)']       = safe_div(df['Dönen Varlıklar']*100, total_assets)
 
-    # --- 7) Short‑term debt focus -----------------------------------------------------
+    #  7) Short‑term debt focus 
     df['Kısa Vade Borç / Aktif']          = safe_div(df['Kısa Vadeli Yükümlülükler'], total_assets)
     df['Kısa Vade Borç / Dönen Varlık']   = safe_div(df['Kısa Vadeli Yükümlülükler'], df['Dönen Varlıklar'])
     df['Kısa Vade Borç / Özsermaye']      = safe_div(df['Kısa Vadeli Yükümlülükler'], df['Özkaynaklar'])
@@ -96,12 +96,12 @@ def compute_ratios(df: pd.DataFrame) -> pd.DataFrame:
     df['Net Satışlar / Kısa Vade Borç']   = safe_div(df['Satış Gelirleri'], df['Kısa Vadeli Yükümlülükler'])
     df['Esas Faaliyet Karı / Kısa Vadeli Borç'] = safe_div(df['Net Faaliyet Kar/Zararı'], df['Kısa Vadeli Yükümlülükler'])
 
-    # --- 8) Misc. profitability -------------------------------------------------------
+    #  8) Misc. profitability 
     df['Aktif Karlılık (%)']  = safe_div(df['Dönem Net Kar/Zararı']*100, total_assets)
     df['ROCE Oranı']          = safe_div(df['FAALİYET KARI (ZARARI)']*100, total_assets)
     df['Finansman Gider / Net Satış'] = safe_div(df['Finansman Giderleri'], df['Satış Gelirleri'])
 
-    # --- 9) Bankruptcy / scoring models ----------------------------------------------
+    # 9) Bankruptcy / scoring models
     # Altman Z inputs
     X1 = safe_div(df['Dönen Varlıklar'] - df['Kısa Vadeli Yükümlülükler'], total_assets)
     X2 = safe_div(df['Geçmiş Yıllar Kar/Zararları'] + df['Dönem Net Kar/Zararı'], total_assets)
@@ -116,7 +116,7 @@ def compute_ratios(df: pd.DataFrame) -> pd.DataFrame:
     Z3 = safe_div(df['Dönen Varlıklar'], df['Kısa Vadeli Yükümlülükler'])
     df['Zmijewski Skoru'] = -4.3 - 4.5*Z1 + 5.7*Z2 - 0.004*Z3
 
-    # L‑model (uses X1–X5 again plus extra liquidity ratios)
+    # L‑model 
     L6 = safe_div(safe_div(df['Nakit ve Nakit Benzerleri'], df['Kısa Vadeli Yükümlülükler']), total_liab)
     L7 = safe_div(total_liab, total_assets)
     df['L Model Skoru'] = (
@@ -129,8 +129,7 @@ def compute_ratios(df: pd.DataFrame) -> pd.DataFrame:
 
 
 ###############################################################################
-# 2 + 3.  Excel’i oku  →  tablola (başlık-transpoz)  →  oranları hesapla
-#         →  modele ver  →  tahmin + indirme
+
 ###############################################################################
 
 st.sidebar.header("1️⃣ Excel Yükle")
@@ -142,27 +141,26 @@ if not file:
     st.info("⬅️ Lütfen analiz edilecek Excel dosyasını seçin.")
     st.stop()
 
-# --------------------------------------------------------------------------- #
-# 2️⃣  VERTICAL → HORIZONTAL dönüştürme  (senin eski kodun bire bir)
-# --------------------------------------------------------------------------- #
+
+
 raw_vert = pd.read_excel(BytesIO(file.read()), header=None, sheet_name=0)
 raw_df = (
     raw_vert
-    .set_index(0)          # Sol 1. sütun başlık oluyor
-    .T                     # Transpoz: başlıklar sütun adı
-    .rename_axis(None)     # İsim yok
+    .set_index(0)         
+    .T                    
+    .rename_axis(None)   
     .reset_index(drop=True)
 )
-raw_df.columns = raw_df.columns.str.strip()           # Gereksiz boşluk ayıkları
-raw_df = raw_df.loc[:, ~raw_df.columns.duplicated()]  # Çift başlık varsa at
+raw_df.columns = raw_df.columns.str.strip()           
+raw_df = raw_df.loc[:, ~raw_df.columns.duplicated()]  
 
 st.write("### Dönüştürülmüş Veri", raw_df.head())
 
-# --------------------------------------------------------------------------- #
-# 3️⃣  Oranları hesapla ve 32 özelliği çıkar
-# --------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- 
+
+# --------------------------------------------------------------------------- 
 with st.spinner("Oranlar hesaplanıyor..."):
-    enriched = compute_ratios(raw_df)             # 32 oran eklenir
+    enriched = compute_ratios(raw_df)           
     model_input = enriched[SELECTED_FEATS].copy()
 
 # Eksik satırları temizle
@@ -173,9 +171,8 @@ if model_input.empty:
     st.error("Hiç analiz edilebilir satır kalmadı.")
     st.stop()
 
-# --------------------------------------------------------------------------- #
-#  Modeli yükle  →  tahmin et  →  sonuçları göster + indir
-# --------------------------------------------------------------------------- #
+
+#  Modeli yükle  
 try:
     pipe, enc = joblib.load(MODEL_PATH)
 except FileNotFoundError:
